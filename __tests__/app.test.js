@@ -29,4 +29,14 @@ beforeEach(() => {
           });
         });
     });
+
   })
+  describe("Testing SAD path", () => {
+  test("404: returns an error message for non-specified routes", () => {
+    return request(app)
+      .get("/api/categoriesssss")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Route does not exist");
+      });
+  });})

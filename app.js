@@ -7,4 +7,10 @@ app.get('/api/categories', getCategories);
 
 app.use(handle500Statuses)
 
+app.all("/*", (req, res) => {
+    res.status(404).send({
+      message: "Route does not exist",
+    });
+  });
+
 module.exports = { app }
