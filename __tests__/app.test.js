@@ -18,6 +18,7 @@ beforeEach(() => {
       .expect(200)
       .then(({ body }) => {
         expect(body.categories).toBeInstanceOf(Array);
+        expect(body.categories).toHaveLength(4)
         body.categories.forEach((category) => {
           expect(category).toEqual(
             expect.objectContaining({
