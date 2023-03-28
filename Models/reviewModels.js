@@ -10,4 +10,32 @@ const fetchReviewById = (id) => {
     return inputIdReview[0];
   });
 };
-module.exports = fetchReviewById;
+
+const fetchReview = () => {
+  const sql = `
+  SELECT
+      reviews.owner,
+      reviews.title,
+      reviews.review_id,
+      reviews.category,
+      reviews.review_img_url,
+      reviews.created_at,
+      reviews.votes,
+      reviews.designer,
+      Count(comments.review_id) as comment_count
+      FROM
+      reviews
+    LEFT JOIN
+      comments
+    ON
+      reviews.review_id=comments.review_id
+    GROUP BY
+      reviews.review_id
+    ORDER BY
+      reviews.created_at DESC;
+  `;
+  return db.query(sql).then((result) => {
+    return result.rows;
+  });
+};
+module.exports = { fetchReviewById, fetchReview };
