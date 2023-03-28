@@ -1,6 +1,17 @@
-const handle500Statuses = (err, req, res, next) => {
-    console.log(err);
-    response.status(500).send("Server Error!");
-  };
-  
-module.exports = { handle500Statuses }
+const handlePSQL400s = (err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ message: "Invalid ID input" });
+  } else {
+    next(err);
+  }
+};
+
+const handleCustomErrors = (err, req, res, next) => {
+  const { status, message } = err;
+  if (status && message) {
+    res.status(status).send({ message });
+  }
+  next(err);
+};
+
+module.exports = { handlePSQL400s, handleCustomErrors };

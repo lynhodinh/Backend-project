@@ -1,16 +1,21 @@
-const express = require('express')
-const getCategories = require('./Controllers/catergoryController.js')
-const { handle500Statuses } = require('./Controllers/errorHandlingControllers')
+const express = require("express");
+const getCategories = require("./Controllers/catergoryController.js");
+const getReviewsById = require("./Controllers/reviewController.js");
+const {
+  handlePSQL400s,
+  handleCustomErrors,
+} = require("./Controllers/errorHandlingControllers");
 const app = express();
 
-app.get('/api/categories', getCategories);
+app.get("/api/categories", getCategories);
 
-app.use(handle500Statuses)
+app.get("/api/reviews/:review_id", getReviewsById);
 
-app.all("/*", (req, res) => {
-    res.status(404).send({
-      message: "Route does not exist",
-    });
+app.use("/*", (req, res) => {
+  res.status(404).send({
+    message: "Route does not exist",
   });
+});
+app.use(handlePSQL400s, handleCustomErrors);
 
-module.exports = { app }
+module.exports = { app };
