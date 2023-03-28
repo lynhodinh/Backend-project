@@ -79,7 +79,7 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 });
-describe.only("GET /api/reviews", () => {
+describe("GET /api/reviews", () => {
   test("200: should return an array of all the review objects", () => {
     return request(app)
       .get("/api/reviews")

@@ -16,7 +16,6 @@ const getReviews = (req, res, next) => {
   fetchReview()
     .then((reviews) => {
       res.status(200).send({ reviews: reviews });
-      console.log(reviews);
     })
     .catch((err) => {
       next(err);
