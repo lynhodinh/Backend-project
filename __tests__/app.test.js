@@ -3,6 +3,7 @@ const { app } = require("../app.js");
 const db = require("../db/connection.js");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
+const toBeSortedBy = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -40,7 +41,6 @@ describe("Testing SAD path", () => {
       });
   });
 });
-
 describe("GET /api/reviews/:review_id", () => {
   test("200: Will return an object corresponding to the review ID with all info", () => {
     return request(app)
@@ -76,6 +76,39 @@ describe("GET /api/reviews/:review_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid ID input");
+      });
+  });
+});
+describe("GET /api/reviews", () => {
+  test("200: should return an array of all the review objects", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toBeInstanceOf(Array);
+        expect(body.reviews).toHaveLength(13);
+        body.reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("the reviews should be sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
