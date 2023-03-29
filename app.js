@@ -3,6 +3,7 @@ const getCategories = require("./Controllers/catergoryController.js");
 const {
   getReviewsById,
   getReviews,
+  getReviewComments,
 } = require("./Controllers/reviewController.js");
 const {
   handlePSQL400s,
@@ -15,6 +16,8 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id", getReviewsById);
+
+app.get("/api/reviews/:review_id/comments", getReviewComments);
 
 app.use("/*", (req, res) => {
   res.status(404).send({

@@ -38,4 +38,36 @@ const fetchReview = () => {
     return result.rows;
   });
 };
-module.exports = { fetchReviewById, fetchReview };
+
+const checkIdExists = (review_id) => {
+  const sql = `
+SELECT * FROM reviews WHERE review_id = $1`;
+  return db.query(sql, [review_id]).then((result) => {
+    if (!result.rowCount) {
+      console.log(result.rowCount);
+      return Promise.reject({ status: 404, message: "ID not found" });
+    }
+  });
+};
+
+const fetchReviewComments = (review_id) => {
+  const sql = `
+      SELECT
+        *
+      FROM
+        comments
+      WHERE
+        review_id = $1
+      ORDER BY
+        created_at DESC
+    `;
+  return db.query(sql, [review_id]).then((result) => {
+    return result.rows;
+  });
+};
+module.exports = {
+  fetchReviewById,
+  fetchReview,
+  fetchReviewComments,
+  checkIdExists,
+};
