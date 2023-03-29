@@ -44,7 +44,6 @@ const checkIdExists = (review_id) => {
 SELECT * FROM reviews WHERE review_id = $1`;
   return db.query(sql, [review_id]).then((result) => {
     if (!result.rowCount) {
-      console.log(result.rowCount);
       return Promise.reject({ status: 404, message: "ID not found" });
     }
   });
