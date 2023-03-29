@@ -61,7 +61,7 @@ describe("GET /api/reviews/:review_id", () => {
         });
       });
   });
-  it("status:404, responds with an error message for valid but non existent review_ids", () => {
+  it("404: responds with an error message for valid but non existent review_ids", () => {
     return request(app)
       .get("/api/reviews/1000")
       .expect(404)
@@ -70,12 +70,12 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 
-  it("status:400, responds with an error message when passed a bad user ID", () => {
+  it("400: responds with an error message when passed a bad user ID", () => {
     return request(app)
       .get("/api/reviews/notAnID")
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid ID input");
+        expect(body.message).toBe("Invalid input: 'review' must be a number");
       });
   });
 });
@@ -103,12 +103,64 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("the reviews should be sorted by date in descending order", () => {
+  test("200: the reviews should be sorted by date in descending order", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then(({ body }) => {
         expect(body.reviews).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("200: should return an array of comments for the given review_id", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toHaveLength(3);
+        body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: comments should be served with the most recent comments first", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: should respond with an empty array if the review ID is valid, but the review has no comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
+      });
+  });
+  test("404: Returns a review ID not found error message for valid but non existent review_ids", () => {
+    return request(app)
+      .get("/api/reviews/9999999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("ID not found");
+      });
+  });
+  test("400: Returns a bad request error message if given a wrongly formated review_id", () => {
+    return request(app)
+      .get("/api/reviews/wrong-input/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid input: 'review' must be a number");
       });
   });
 });

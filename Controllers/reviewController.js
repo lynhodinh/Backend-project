@@ -1,5 +1,10 @@
 const reviews = require("../db/data/test-data/reviews");
-const { fetchReviewById, fetchReview } = require("../Models/reviewModels");
+const {
+  fetchReviewById,
+  fetchReview,
+  fetchReviewComments,
+  checkIdExists,
+} = require("../Models/reviewModels");
 
 const getReviewsById = (req, res, next) => {
   const { review_id } = req.params;
@@ -22,4 +27,22 @@ const getReviews = (req, res, next) => {
     });
 };
 
-module.exports = { getReviewsById, getReviews };
+const getReviewComments = (req, res, next) => {
+  const { review_id } = req.params;
+
+  fetchReviewComments(review_id)
+    .then((reviewComments) => {
+      if (!reviewComments.length) {
+        return checkIdExists(review_id);
+      }
+      res.status(200).send({ comments: reviewComments });
+    })
+    .then(() => {
+      res.status(200).send({ comments: [] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = { getReviewsById, getReviews, getReviewComments };
