@@ -164,3 +164,22 @@ describe("GET /api/reviews/:review_id/comments", () => {
       });
   });
 });
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("201: should post a comment that is an object corresponding to the review_id", () => {
+    return request(app)
+      .get("/api/categories")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.categories).toBeInstanceOf(Array);
+        expect(body.categories).toHaveLength(4);
+        body.categories.forEach((category) => {
+          expect(category).toEqual(
+            expect.objectContaining({
+              slug: expect.any(String),
+              description: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
