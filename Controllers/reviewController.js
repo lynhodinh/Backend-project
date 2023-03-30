@@ -4,6 +4,7 @@ const {
   fetchReview,
   fetchReviewComments,
   checkIdExists,
+  insertComment,
 } = require("../Models/reviewModels");
 
 const getReviewsById = (req, res, next) => {
@@ -45,4 +46,24 @@ const getReviewComments = (req, res, next) => {
     });
 };
 
-module.exports = { getReviewsById, getReviews, getReviewComments };
+const postCommentById = (req, res, next) => {
+  const { username, body } = req.body;
+  const { review_id } = req.params;
+
+  checkIdExists(review_id)
+    .then(() => {
+      return insertComment(username, body, review_id).then((comment) => {
+        res.status(201).send({ comment: comment });
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = {
+  getReviewsById,
+  getReviews,
+  getReviewComments,
+  postCommentById,
+};

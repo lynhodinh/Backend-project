@@ -165,21 +165,59 @@ describe("GET /api/reviews/:review_id/comments", () => {
   });
 });
 describe("POST /api/reviews/:review_id/comments", () => {
-  test("201: should post a comment that is an object corresponding to the review_id", () => {
+  test("201: Correctly posts a comment object under the specified review_id", () => {
     return request(app)
-      .get("/api/categories")
-      .expect(200)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "bainesface",
+        body: "Testing comment.",
+      })
+      .expect(201)
       .then(({ body }) => {
-        expect(body.categories).toBeInstanceOf(Array);
-        expect(body.categories).toHaveLength(4);
-        body.categories.forEach((category) => {
-          expect(category).toEqual(
-            expect.objectContaining({
-              slug: expect.any(String),
-              description: expect.any(String),
-            })
-          );
+        console.log(body);
+        expect(body.comment).toMatchObject({
+          body: "Testing comment.",
+          votes: 0,
+          author: "bainesface",
+          review_id: 2,
+          created_at: expect.any(String),
         });
+      });
+  });
+  test("400: if input for review_id in path is formatted incorrectly", () => {
+    return request(app)
+      .post("/api/reviews/notanumber/comments")
+      .send({
+        username: "bainesface",
+        body: "Testing comment.",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid input: 'review' must be a number");
+      });
+  });
+  test("404: if review_id is in the correct format but does not exist", () => {
+    return request(app)
+      .post("/api/reviews/28/comments")
+      .send({
+        username: "bainesface",
+        body: "Testing comment.",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("ID not found");
+      });
+  });
+  test("400: if body does not have a comment it will inform them to add one", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "bainesface",
+        body: "",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Please post a comment");
       });
   });
 });

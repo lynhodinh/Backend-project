@@ -64,9 +64,27 @@ const fetchReviewComments = (review_id) => {
     return result.rows;
   });
 };
+
+const insertComment = (username, body, review_id) => {
+  const sql = `
+      INSERT INTO comments
+      (author, body, review_id)
+      VALUES
+      ($1, $2, $3)
+      RETURNING *;`;
+  if (!body) {
+    return Promise.reject({ status: 400, message: "Please post a comment" });
+  }
+  return db.query(sql, [username, body, review_id]).then((result) => {
+    console.log(result.rows[0]);
+    return result.rows[0];
+  });
+};
+
 module.exports = {
   fetchReviewById,
   fetchReview,
   fetchReviewComments,
   checkIdExists,
+  insertComment,
 };
