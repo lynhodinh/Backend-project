@@ -174,7 +174,6 @@ describe("POST /api/reviews/:review_id/comments", () => {
       })
       .expect(201)
       .then(({ body }) => {
-        console.log(body);
         expect(body.comment).toMatchObject({
           body: "Testing comment.",
           votes: 0,
@@ -182,6 +181,19 @@ describe("POST /api/reviews/:review_id/comments", () => {
           review_id: 2,
           created_at: expect.any(String),
         });
+      });
+  });
+  test("201: ignore any extra, unnecessary properties on the input object.", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "bainesface",
+        body: "Test comment.",
+        extraProp: "This property should be ignored.",
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).not.toHaveProperty("extraProp");
       });
   });
   test("400: if input for review_id in path is formatted incorrectly", () => {
@@ -218,6 +230,18 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Please post a comment");
+      });
+  });
+  test("POST responds with 404 if username doesn't exist", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "fakeuser",
+        body: "Testing comment.",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Username not found");
       });
   });
 });

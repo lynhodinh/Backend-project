@@ -6,7 +6,6 @@ const {
   checkIdExists,
   insertComment,
 } = require("../Models/reviewModels");
-
 const getReviewsById = (req, res, next) => {
   const { review_id } = req.params;
   fetchReviewById(review_id)

@@ -67,17 +67,29 @@ const fetchReviewComments = (review_id) => {
 
 const insertComment = (username, body, review_id) => {
   const sql = `
-      INSERT INTO comments
-      (author, body, review_id)
-      VALUES
-      ($1, $2, $3)
-      RETURNING *;`;
-  if (!body) {
-    return Promise.reject({ status: 400, message: "Please post a comment" });
-  }
-  return db.query(sql, [username, body, review_id]).then((result) => {
-    console.log(result.rows[0]);
-    return result.rows[0];
+        INSERT INTO comments
+        (author, body, review_id)
+        VALUES
+        ($1, $2, $3)
+        RETURNING *;`;
+
+  const checkUserSql = `
+        SELECT * FROM users
+        WHERE username = $1;
+    `;
+
+  return db.query(checkUserSql, [username]).then((userResult) => {
+    if (userResult.rows.length === 0) {
+      return Promise.reject({ status: 404, message: "Username not found" });
+    }
+
+    if (!body) {
+      return Promise.reject({ status: 400, message: "Please post a comment" });
+    }
+
+    return db.query(sql, [username, body, review_id]).then((commentResult) => {
+      return commentResult.rows[0];
+    });
   });
 };
 
