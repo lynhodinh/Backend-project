@@ -93,10 +93,23 @@ const insertComment = (username, body, review_id) => {
   });
 };
 
+const updateReviewVotes = (review_id, votesToAdd) => {
+  const sql = `
+      UPDATE reviews
+      SET
+      votes = votes + $1
+      WHERE review_id = $2
+      RETURNING *;`;
+  return db.query(sql, [votesToAdd, review_id]).then((results) => {
+    return results.rows;
+  });
+};
+
 module.exports = {
   fetchReviewById,
   fetchReview,
   fetchReviewComments,
   checkIdExists,
   insertComment,
+  updateReviewVotes,
 };

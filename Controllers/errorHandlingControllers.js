@@ -2,7 +2,10 @@ const handlePSQL400s = (err, req, res, next) => {
   if (err.code === "22P02") {
     res
       .status(400)
-      .send({ message: "Invalid input: 'review' must be a number" });
+      .send({
+        message:
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again",
+      });
   } else {
     next(err);
   }

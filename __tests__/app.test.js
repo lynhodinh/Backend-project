@@ -61,7 +61,7 @@ describe("GET /api/reviews/:review_id", () => {
         });
       });
   });
-  it("404: responds with an error message for valid but non existent review_ids", () => {
+  test("404: responds with an error message for valid but non existent review_ids", () => {
     return request(app)
       .get("/api/reviews/1000")
       .expect(404)
@@ -70,12 +70,14 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 
-  it("400: responds with an error message when passed a bad user ID", () => {
+  test("400: responds with an error message when passed a bad user ID", () => {
     return request(app)
       .get("/api/reviews/notAnID")
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid input: 'review' must be a number");
+        expect(body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
       });
   });
 });
@@ -160,7 +162,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/wrong-input/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid input: 'review' must be a number");
+        expect(body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
       });
   });
 });
@@ -205,7 +209,9 @@ describe("POST /api/reviews/:review_id/comments", () => {
       })
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe("Invalid input: 'review' must be a number");
+        expect(body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
       });
   });
   test("404: if review_id is in the correct format but does not exist", () => {
@@ -242,6 +248,81 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Username not found");
+      });
+  });
+});
+describe("PATCH /api/reviews/:review_id (votes)", () => {
+  test("200: should respond with the corresponding review object with the vote property value increased", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedVote).toMatchObject({
+          review_id: 1,
+          title: "Agricola",
+          category: "euro game",
+          designer: "Uwe Rosenberg",
+          owner: "mallionaire",
+          review_body: "Farmyard fun!",
+          review_img_url:
+            "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+          created_at: "2021-01-18T10:00:20.514Z",
+          votes: 2,
+        });
+      });
+  });
+  test("200: should respond with the corresponding review object with the vote property value decreased", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: -100 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedVote).toMatchObject({
+          review_id: 1,
+          title: "Agricola",
+          category: "euro game",
+          designer: "Uwe Rosenberg",
+          owner: "mallionaire",
+          review_body: "Farmyard fun!",
+          review_img_url:
+            "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+          created_at: "2021-01-18T10:00:20.514Z",
+          votes: -99,
+        });
+      });
+  });
+  test("404: Returns a review ID not found error message for valid but non existent review_ids", () => {
+    return request(app)
+      .patch("/api/reviews/666")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("ID not found");
+      });
+  });
+  test("400: Returns a bad request error message if given a wrongly formated review_id", () => {
+    return request(app)
+      .patch("/api/reviews/wronginput")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
+      });
+  });
+  test("400: if a if the input value of inc_votes is in the incorrect format", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({
+        inc_votes: "wrong input",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
       });
   });
 });
