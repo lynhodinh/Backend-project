@@ -5,6 +5,7 @@ const {
   fetchReviewComments,
   checkIdExists,
   insertComment,
+  updateReviewVotes,
 } = require("../Models/reviewModels");
 const getReviewsById = (req, res, next) => {
   const { review_id } = req.params;
@@ -60,9 +61,25 @@ const postCommentById = (req, res, next) => {
     });
 };
 
+const patchReviewVotes = (req, res, next) => {
+  const { review_id } = req.params;
+  const { inc_votes: votesToAdd } = req.body;
+  updateReviewVotes(review_id, votesToAdd)
+    .then((updatedReview) => {
+      if (updatedReview.length === 0) {
+        return checkIdExists(review_id);
+      }
+      res.status(200).send({ updatedVote: updatedReview[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 module.exports = {
   getReviewsById,
   getReviews,
   getReviewComments,
   postCommentById,
+  patchReviewVotes,
 };
