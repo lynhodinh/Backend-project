@@ -7,6 +7,7 @@ const {
   postCommentById,
   patchReviewVotes,
 } = require("./Controllers/reviewController.js");
+const { getUsers } = require("./Controllers/userController.js");
 const {
   handlePSQL400s,
   handleCustomErrors,
@@ -18,6 +19,8 @@ app.use(express.json());
 app.get("/api/categories", getCategories);
 
 app.get("/api/reviews", getReviews);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/reviews/:review_id", getReviewsById);
 
