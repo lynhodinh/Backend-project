@@ -328,7 +328,12 @@ describe("PATCH /api/reviews/:review_id (votes)", () => {
 });
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: should return no content when passed the correct comment_id", () => {
-    return request(app).delete("/api/comments/6").expect(204);
+    return request(app)
+      .delete("/api/comments/6")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body.message).toBe(undefined);
+      });
   });
   test("404: If comment_id is in the correct format but does not exist", () => {
     return request(app)
@@ -366,7 +371,7 @@ describe("GET /api/users", () => {
         });
       });
   });
-  test("404: Path not found if users is spelt incorrectly", () => {
+  test("404: error message shown if users is spelt incorrectly", () => {
     return request(app)
       .get("/api/userz")
       .expect(404)
