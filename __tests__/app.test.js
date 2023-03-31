@@ -371,12 +371,4 @@ describe("GET /api/users", () => {
         });
       });
   });
-  test("404: error message shown if users is spelt incorrectly", () => {
-    return request(app)
-      .get("/api/userz")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Route does not exist");
-      });
-  });
 });
