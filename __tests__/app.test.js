@@ -326,3 +326,26 @@ describe("PATCH /api/reviews/:review_id (votes)", () => {
       });
   });
 });
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: should return no content when passed the correct comment_id", () => {
+    return request(app).delete("/api/comments/6").expect(204);
+  });
+  test("404: If comment_id is in the correct format but does not exist", () => {
+    return request(app)
+      .delete("/api/comments/9999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Comment ID not found.");
+      });
+  });
+  test("400: If comment_id is in the incorrect format", () => {
+    return request(app)
+      .delete("/api/comments/wrong-format")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
+        );
+      });
+  });
+});

@@ -10,7 +10,10 @@ const {
 const {
   handlePSQL400s,
   handleCustomErrors,
+  handle500s,
 } = require("./Controllers/errorHandlingControllers");
+
+const { deleteComment } = require("./Controllers/commentController.js");
 
 const app = express();
 app.use(express.json());
@@ -27,11 +30,13 @@ app.get("/api/reviews/:review_id/comments", getReviewComments);
 
 app.post("/api/reviews/:review_id/comments", postCommentById);
 
+app.delete("/api/comments/:comment_id", deleteComment);
+
 app.use("/*", (req, res) => {
   res.status(404).send({
     message: "Route does not exist",
   });
 });
-app.use(handlePSQL400s, handleCustomErrors);
+app.use(handlePSQL400s, handleCustomErrors, handle500s);
 
 module.exports = { app };
