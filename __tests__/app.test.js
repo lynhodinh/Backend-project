@@ -328,7 +328,12 @@ describe("PATCH /api/reviews/:review_id (votes)", () => {
 });
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: should return no content when passed the correct comment_id", () => {
-    return request(app).delete("/api/comments/6").expect(204);
+    return request(app)
+      .delete("/api/comments/6")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body.message).toBe(undefined);
+      });
   });
   test("404: If comment_id is in the correct format but does not exist", () => {
     return request(app)
@@ -346,6 +351,24 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(body.message).toBe(
           "We were unable to process your request as it appears to be invalid. Please check your spelling and try again"
         );
+      });
+  });
+});
+describe("GET /api/users", () => {
+  test("200: returns an array of objects each object having username, name and avatar_url properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).toHaveLength(4);
+        expect(body.users).toBeInstanceOf(Array);
+        body.users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
       });
   });
 });
