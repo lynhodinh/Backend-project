@@ -1,4 +1,5 @@
 const express = require("express");
+const endpoints = require("./endpoints.json");
 const getCategories = require("./Controllers/catergoryController.js");
 const {
   getReviewsById,
@@ -23,7 +24,9 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get("/api");
+app.get("/api", (req, res) => {
+  res.status(200).json(endpoints);
+});
 
 app.get("/api/categories", getCategories);
 
