@@ -4,6 +4,7 @@ const db = require("../db/connection.js");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const toBeSortedBy = require("jest-sorted");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -12,6 +13,18 @@ beforeEach(() => {
 afterAll(() => {
   return db.end();
 });
+
+describe("GET /api", () => {
+  test("200: should respond with a JSON file describing endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(endpoints);
+      });
+  });
+});
+
 describe("GET /api/categories", () => {
   test("200: should return an array of all the category objects", () => {
     return request(app)
@@ -367,6 +380,28 @@ describe("GET /api/users", () => {
             username: expect.any(String),
             name: expect.any(String),
             avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
+xdescribe("GET /api/reviews (queries)", () => {
+  test("200: Able to sort a query depending on category", () => {
+    return request(app)
+      .get("/api/reviews?category=euro game")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toHaveLength(11);
+        body.reviews.forEach((review) => {
+          expect(review).toMatchObject({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            category: "euro game",
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
           });
         });
       });
